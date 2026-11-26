@@ -19,6 +19,8 @@ https://ma.anixa.tv/clips/stream/anixehd/index.m3u8
 https://amogonetworx-grjngo-3-dk.samsung.wurl.tv/playlist.m3u8
 #EXTINF:-1 tvg-id="AXNBlack.de@SD" tvg-logo="https://i.imgur.com/Peo1QiZ.png" http-user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36" group-title="Deutsch | Filme & Serien",AXN Black (Germany)
 http://46.244.99.71:8181/stream/35/index.m3u8
+#EXTINF:-1 tvg-id="AXNWhite.de@HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/6/68/AXN_White_logo_%282015%29.svg" http-user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36" group-title="Deutsch | Filme & Serien",AXN White (Germany)
+http://46.244.99.71:8181/stream/50/index.m3u8
 #EXTINF:-1 tvg-id="Moviedome.us@Germany" tvg-logo="https://i.imgur.com/8c54ycg.png" group-title="Deutsch | Filme & Serien",Moviedome (720p)
 https://jmp2.uk/plu-615c1e5ce3039400070a0547.m3u8
 #EXTINF:-1 tvg-id="PlutoTVBritischeSerien.de@DACH" tvg-logo="https://images.pluto.tv/channels/677e5a3d7bffa6000808dbf2/colorLogoPNG.png" group-title="Deutsch | Filme & Serien",Pluto TV Britische Serien
@@ -53,12 +55,16 @@ https://jmp2.uk/plu-69776b58036e883f39e5ab8a.m3u8
 https://adriaapp.b-cdn.net/1080p/index.m3u8
 #EXTINF:-1 tvg-id="BibelTVMusik.de@SD" tvg-logo="https://i.imgur.com/yIqOcP5.png" group-title="Deutsch | Musik",Bibel TV Musik (720p)
 https://bibeltv03.iptv-playoutcenter.de/bibeltv03/bibeltv03.stream_1/playlist.m3u8
+#EXTINF:-1 tvg-id="DeluxeDance.de@SD" tvg-logo="https://i.imgur.com/Qu7t15Y.png" group-title="Deutsch | Musik",Deluxe Dance (1080p)
+https://sdn-global-live-streaming-packager-cache.3qsdn.com/64733/64733_264_live.m3u8
+#EXTINF:-1 tvg-id="DeluxeLounge.de@SD" tvg-logo="https://i.imgur.com/pgCA35z.png" group-title="Deutsch | Musik",Deluxe Lounge (720p)
+https://jmp2.uk/stvp-CHAJ0500413A
 #EXTINF:-1 tvg-id="DeluxeMusic.de@SD" tvg-logo="https://i.imgur.com/HimuPPb.png" group-title="Deutsch | Musik",Deluxe Music (720p)
 https://sdn-global-live-streaming-packager-cache.3qsdn.com/13456/13456_264_live.m3u8
+#EXTINF:-1 tvg-id="DeluxeRap.de@SD" tvg-logo="https://i.imgur.com/s3h67hx.png" group-title="Deutsch | Musik",Deluxe Rap (1080p)
+https://sdn-global-live-streaming-packager-cache.3qsdn.com/65183/65183_264_live.m3u8
 #EXTINF:-1 tvg-id="FolxMusicTelevision.de@SD" tvg-logo="https://i.imgur.com/ze04puX.png" group-title="Deutsch | Musik",Folx Music Television
 https://folxapp.b-cdn.net/1080p/index.m3u8
-#EXTINF:-1 tvg-id="AXNWhite.de@HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/6/68/AXN_White_logo_%282015%29.svg" http-user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36" group-title="Deutsch | Musik",AXN White (Germany)
-http://46.244.99.71:8181/stream/50/index.m3u8
 #EXTINF:-1 tvg-id="MagentaMusik360.de@SD" tvg-logo="https://i.imgur.com/R74gG7U.png" group-title="Deutsch | Musik",MagentaMusik 360 (1080p)
 https://streaming.magentamusik.de/csm/573870/magentamusik1/index.m3u8
 #EXTINF:-1 tvg-id="OneMusicTelevision.de@SD" tvg-logo="https://i.imgur.com/dLgoKJ0.png" group-title="Deutsch | Musik",One Music Television
@@ -117,12 +123,6 @@ https://muc3.iptv-playoutcenter.de/dokusat/dokusat1/playlist.m3u8
 https://s6.hopslan.com/dokuX/index.m3u8
 #EXTINF:-1 tvg-id="N24Doku.de@SD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/N24Doku.svg/960px-N24Doku.svg.png" group-title="Deutsch | Doku",N24 Doku
 https://jmp2.uk/plu-60080e8a4bf36000076a81b1.m3u8
-#EXTINF:-1 tvg-id="PlutoTVNature.de@DACH" tvg-logo="https://images.pluto.tv/channels/5be1c3f9851dd5632e2c91b2/colorLogoPNG.png" group-title="Deutsch | Doku",Pluto TV Nature
-https://jmp2.uk/plu-5be1c3f9851dd5632e2c91b2.m3u8
-#EXTINF:-1 tvg-id="BRFernsehen.de@Nord" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Logo_Bayerischer_Rundfunk_2024.svg/960px-Logo_Bayerischer_Rundfunk_2024.svg.png" group-title="Deutsch | Regional",BR Fernsehen (720p)
-https://mcdn.br.de/br/fs/bfs_nord/hls/de/master.m3u8
-#EXTINF:-1 tvg-id="BRFernsehen.de@Sud" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Logo_Bayerischer_Rundfunk_2024.svg/960px-Logo_Bayerischer_Rundfunk_2024.svg.png" group-title="Deutsch | Regional",BR Fernsehen Sud (1080p)
-https://mcdn.br.de/br/fs/bfs_sued/hls/de/master.m3u8
 #EXTINF:-1 tvg-id="MDRFernsehen.de@Sachsen" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/MDR_Logo_2017.svg/960px-MDR_Logo_2017.svg.png" group-title="Deutsch | Regional",MDR Fernsehen (1080p) [Geo-blocked]
 https://mdrtvsnhls.akamaized.net/hls/live/2016928/mdrtvsn/index.m3u8
 #EXTINF:-1 tvg-id="MDRFernsehen.de@SachsenAnhalt" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/MDR_Logo_2017.svg/960px-MDR_Logo_2017.svg.png" group-title="Deutsch | Regional",MDR Fernsehen Sachsen Anhalt (1080p) [Geo-blocked]
@@ -143,8 +143,6 @@ https://dash2.antik.sk/live/test_rbb_tizen/playlist.m3u8
 https://rbb-hls-berlin.akamaized.net/hls/live/2017824/rbb_berlin/index.m3u8
 #EXTINF:-1 tvg-id="rbbFernsehen.de@Brandenburg" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Rbb_Fernsehen_Logo_2017.08.svg/960px-Rbb_Fernsehen_Logo_2017.08.svg.png" group-title="Deutsch | Regional",rbb Fernsehen Brandenburg (1080p) [Geo-blocked]
 https://rbb-hls-brandenburg.akamaized.net/hls/live/2017825/rbb_brandenburg/master.m3u8
-#EXTINF:-1 tvg-id="SRFernsehen.de@SD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/SR_Fernsehen_Logo_2023.svg/960px-SR_Fernsehen_Logo_2023.svg.png" group-title="Deutsch | Regional",SR Fernsehen (720p)
-https://srfs.akamaized.net/hls/live/689649/srfsgeo/index.m3u8
 #EXTINF:-1 tvg-id="SWRFernsehenBadenWurttemberg.de@SD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/SWR_Logo_2023.svg/960px-SWR_Logo_2023.svg.png" group-title="Deutsch | Regional",SWR Fernsehen Baden-Wurttemberg (720p) [Geo-blocked]
 https://swrbwd-hls.akamaized.net/hls/live/2018672/swrbwd/master.m3u8
 #EXTINF:-1 tvg-id="SWRFernsehenHD.de@SD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/SWR_Logo_2023.svg/960px-SWR_Logo_2023.svg.png" group-title="Deutsch | Regional",SWR Fernsehen HD
@@ -225,6 +223,10 @@ https://bibeltv02.iptv-playoutcenter.de/bibeltv02/bibeltv02.stream_1/playlist.m3
 https://jmp2.uk/plu-663e09e4b18d700008e48dcf.m3u8
 #EXTINF:-1 tvg-id="BLKRegionalTV.de@SD" tvg-logo="https://i.imgur.com/JLgnPG1.png" group-title="Deutsch | Allgemein",BLK Regional TV (1080p)
 https://58bd5b7a98e04.streamlock.net/medienasa-live/_definst_/mp4:BLKonline_high/playlist.m3u8
+#EXTINF:-1 tvg-id="BRFernsehen.de@Nord" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Logo_Bayerischer_Rundfunk_2024.svg/960px-Logo_Bayerischer_Rundfunk_2024.svg.png" group-title="Deutsch | Allgemein",BR Fernsehen (720p)
+https://mcdn.br.de/br/fs/bfs_nord/hls/de/master.m3u8
+#EXTINF:-1 tvg-id="BRFernsehen.de@Sud" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Logo_Bayerischer_Rundfunk_2024.svg/960px-Logo_Bayerischer_Rundfunk_2024.svg.png" group-title="Deutsch | Allgemein",BR Fernsehen Sud (1080p)
+https://mcdn.br.de/br/fs/bfs_sued/hls/de/master.m3u8
 #EXTINF:-1 tvg-id="BTLTV.nl@SD" tvg-logo="https://yt3.googleusercontent.com/ytc/APkrFKZYgQTsDhkbaqmPRCPZIf0UgZqF1wa6aG2eo8ti=s176-c-k-c0x00ffffff-no-rj-mo" group-title="Deutsch | Allgemein",BTL TV (Netherlands) (1080p)
 https://cdn.liveplustv.com/v1/live/btl-tv/master.m3u8
 #EXTINF:-1 tvg-id="CCPlutoTV.de@DACH" tvg-logo="https://images.pluto.tv/channels/5d4947590ba40f75dc29c26b/colorLogoPNG.png" group-title="Deutsch | Allgemein",CC Pluto TV
@@ -245,12 +247,6 @@ https://swrdasdingvr-hls.akamaized.net/hls/live/2018681/dasdingvr/master.m3u8
 https://jmp2.uk/plu-64b67f0424ade50008a3be17.m3u8
 #EXTINF:-1 tvg-id="DAZNHeldinnenxPlutoTV.de@DACH" tvg-logo="https://images.pluto.tv/channels/64afe50c5dc16600087f3227/colorLogoPNG.png" group-title="Deutsch | Allgemein",DAZN Heldinnen x Pluto TV
 https://jmp2.uk/plu-64afe50c5dc16600087f3227.m3u8
-#EXTINF:-1 tvg-id="DeluxeDance.de@SD" tvg-logo="https://i.imgur.com/Qu7t15Y.png" group-title="Deutsch | Allgemein",Deluxe Dance (1080p)
-https://sdn-global-live-streaming-packager-cache.3qsdn.com/64733/64733_264_live.m3u8
-#EXTINF:-1 tvg-id="DeluxeLounge.de@SD" tvg-logo="https://i.imgur.com/pgCA35z.png" group-title="Deutsch | Allgemein",Deluxe Lounge (720p)
-https://jmp2.uk/stvp-CHAJ0500413A
-#EXTINF:-1 tvg-id="DeluxeRap.de@SD" tvg-logo="https://i.imgur.com/s3h67hx.png" group-title="Deutsch | Allgemein",Deluxe Rap (1080p)
-https://sdn-global-live-streaming-packager-cache.3qsdn.com/65183/65183_264_live.m3u8
 #EXTINF:-1 tvg-id="DieNeueZeitTV.ch@SD" tvg-logo="https://i.imgur.com/K3lvrog.png" group-title="Deutsch | Allgemein",Die Neue Zeit TV (576p)
 https://bild-und-ton.stream/die-neue-zeit-tv-live/smil:dnz-de.smil/playlist.m3u8
 #EXTINF:-1 tvg-id="DisneyChannel.de@SD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/3/3d/2022_Disney_Channel_logo.svg" group-title="Deutsch | Allgemein",Disney Channel (Germany) (576p)
@@ -445,6 +441,8 @@ https://jmp2.uk/plu-66337de656fc840008ff7a65.m3u8
 https://jmp2.uk/plu-69a554179a3f3bb488c7d2be.m3u8
 #EXTINF:-1 tvg-id="PlutoTVMystery.de@DACH" tvg-logo="https://images.pluto.tv/channels/617aad99b68ef100072608cd/colorLogoPNG.png" group-title="Deutsch | Allgemein",Pluto TV Mystery
 https://jmp2.uk/plu-617aad99b68ef100072608cd.m3u8
+#EXTINF:-1 tvg-id="PlutoTVNature.de@DACH" tvg-logo="https://images.pluto.tv/channels/5be1c3f9851dd5632e2c91b2/colorLogoPNG.png" group-title="Deutsch | Allgemein",Pluto TV Nature
+https://jmp2.uk/plu-5be1c3f9851dd5632e2c91b2.m3u8
 #EXTINF:-1 tvg-id="PlutoTVNordicCrime.de@DACH" tvg-logo="https://images.pluto.tv/channels/67d984408d8dc3d7754dccf2/colorLogoPNG_1746817551952.png" group-title="Deutsch | Allgemein",Pluto TV Nordic Crime
 https://jmp2.uk/plu-67d984408d8dc3d7754dccf2.m3u8
 #EXTINF:-1 tvg-id="PlutoTVReportagen.de@DACH" tvg-logo="https://images.pluto.tv/channels/68ada3edf84960586ad31c7d/colorLogoPNG_1760078189640.png" group-title="Deutsch | Allgemein",Pluto TV Reportagen
@@ -549,6 +547,8 @@ https://jmp2.uk/plu-646b14a0e94c3800082a8d3a.m3u8
 https://jmp2.uk/plu-646b150a15939400089e2702.m3u8
 #EXTINF:-1 tvg-id="SpongeBobSchwammkopf.de@DACH" tvg-logo="https://images.pluto.tv/channels/5d00e8adaab96b5635b2a005/colorLogoPNG.png" group-title="Deutsch | Allgemein",SpongeBob Schwammkopf (720p)
 https://jmp2.uk/plu-5d00e8adaab96b5635b2a005.m3u8
+#EXTINF:-1 tvg-id="SRFernsehen.de@SD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/SR_Fernsehen_Logo_2023.svg/960px-SR_Fernsehen_Logo_2023.svg.png" group-title="Deutsch | Allgemein",SR Fernsehen (720p)
+https://srfs.akamaized.net/hls/live/689649/srfsgeo/index.m3u8
 #EXTINF:-1 tvg-id="SRF.de@SD" tvg-logo="https://i.imgur.com/92XNBmr.png" group-title="Deutsch | Allgemein",SRF (1080p)
 https://58de7a369a9c4.streamlock.net/srf/stream_720p/playlist.m3u8
 #EXTINF:-1 tvg-id="Strongman.us@Germany" tvg-logo="https://i.imgur.com/bVQBF6R.png" group-title="Deutsch | Allgemein",Strongman (720p)
@@ -1019,3 +1019,7 @@ https://ncdn.telewebion.ir/taban/live/playlist.m3u8
 https://hls.yourtime.live/hls/stream.m3u8
 #EXTINF:-1 tvg-id="ZagrosTV.ir@SD" tvg-logo="https://upload.wikimedia.org/wikipedia/fa/thumb/e/e4/Kermanshah_Zaghros.svg/960px-Kermanshah_Zaghros.svg.png" group-title="Persisch | Allgemein",Zagros TV (Iran) (576p)
 https://ncdn.telewebion.ir/zagros/live/playlist.m3u8
+#EXTINF:-1 tvg-id="" group-title="Telewebion | Allgemein",Nesfejahan (720p)
+https://ncdn.telewebion.ir/nesfejahan/live/playlist.m3u8
+#EXTINF:-1 tvg-id="" group-title="Telewebion | Allgemein",TV1 Plus (1080p) [Not 24/7]
+https://ncdn.telewebion.ir/tv1plus/live/playlist.m3u8
