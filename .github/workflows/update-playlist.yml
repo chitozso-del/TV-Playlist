@@ -7,41 +7,36 @@ on:
 
 permissions:
   contents: write
-*jobs:
+
+jobs:
   update:
-    runs-on: ubunt*-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - name: *epository laden
-        uses: acti*ns/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: IPTV*Listen herunterladen
-        run: *
-          curl -L "https://iptv-org.github.io/iptv/countries/de.m3u"*-o de.m3u
-          curl -L "https://iptv-org.github.io/iptv/countries/ir.m3u" -o ir.m3u
-          curl *L "https://iptv-org.github.io/iptv/languages/fas.m3u" -o fas.m3u
-
-   *  - name: Playlists zusammenfuehre*
+      - name: Download playlists
         run: |
-          echo "#E*TM3U" > TV-Deutschland-Iran-Persis*h.m3u
+          curl -fL "https://iptv-org.github.io/iptv/countries/de.m3u" -o de.m3u
+          curl -fL "https://iptv-org.github.io/iptv/countries/ir.m3u" -o ir.m3u
+          curl -fL "https://iptv-org.github.io/iptv/languages/fas.m3u" -o fas.m3u
 
-          tail -n +2 de.m3u*>> TV-Deutschland-Iran-Persisch.m3*
-          tail -n +2 ir.m3u >> TV*Deutschland-Iran-Persisch.m3u
-    *     tail -n +2 fas.m3u >> TV-Deut*chland-Iran-Persisch.m3u
-
-      - *ame: Temporaere Dateien entfernen
-*       run: |
-          rm -f de.m*u ir.m3u fas.m3u
-
-      - name: Pl*ylist speichern
+      - name: Create combined playlist
         run: |
-   *      git config user.name "github*actions"
-          git config user*email "github-actions@github.com"
-*          git add TV-Deutschland-I*an-Persisch.m3u
+          echo "#EXTM3U" > TV-Deutschland-Iran-Persisch.m3u
+          tail -n +2 de.m3u >> TV-Deutschland-Iran-Persisch.m3u
+          tail -n +2 ir.m3u >> TV-Deutschland-Iran-Persisch.m3u
+          tail -n +2 fas.m3u >> TV-Deutschland-Iran-Persisch.m3u
 
-          if git *iff --cached --quiet; then
-       *    echo "Keine Aenderungen"
-     *    else
-            git commit -m*"IPTV Playlist automatisch aktuali*iert"
-            git push
-       *  fi
+      - name: Remove temporary files
+        run: |
+          rm -f de.m3u ir.m3u fas.m3u
+
+      - name: Commit playlist
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add TV-Deutschland-Iran-Persisch.m3u
+          git diff --cached --quiet || git commit -m "Update IPTV Playlist"
+          git push
