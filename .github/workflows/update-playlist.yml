@@ -16,27 +16,131 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download playlists
+      - name: Download IPTV playlists
         run: |
-          curl -fL "https://iptv-org.github.io/iptv/countries/de.m3u" -o de.m3u
-          curl -fL "https://iptv-org.github.io/iptv/countries/ir.m3u" -o ir.m3u
-          curl -fL "https://iptv-org.github.io/iptv/languages/fas.m3u" -o fas.m3u
+          curl -fL "https://iptv-org.github.io/iptv/countries/de.m3u" -o deutsch.m3u
+          curl -fL "https://iptv-org.github.io/iptv/countries/ir.m3u" -o iran.m3u
+          curl -fL "https://iptv-org.github.io/iptv/languages/fas.m3u" -o persisch.m3u
 
-      - name: Create combined playlist
+      - name: Create sorted playlist
+        shell: python
         run: |
-          echo "#EXTM3U" > TV-Deutschland-Iran-Persisch.m3u
-          tail -n +2 de.m3u >> TV-Deutschland-Iran-Persisch.m3u
-          tail -n +2 ir.m3u >> TV-Deutschland-Iran-Persisch.m3u
-          tail -n +2 fas.m3u >> TV-Deutschland-Iran-Persisch.m3u
+          import re
+
+          sources = [
+              ("deutsch.m3u", "Deutsch"),
+              ("iran.m3u", "Persisch"),
+              ("persisch.m3u", "Persisch")
+          ]
+
+          output_file = "TV-Deutschland-Iran-Persisch.m3u"
+
+          seen_urls = set()
+          channels = []
+
+          for filename, group in sources:
+              with open(filename, "r", encoding="utf-8-sig", errors="ignore") as f:
+                  lines = f.readlines()
+
+              i = 0
+
+              while i < len(lines):
+                  line = lines[i].strip()
+
+                  if line.startswith("#EXTINF:"):
+                      metadata = line
+                      url = ""
+
+                      j = i + 1
+
+                      while j < len(lines):
+                          candidate = lines[j].strip()
+
+                          if candidate and not candidate.startswith("#"):
+                              url = candidate
+                              break
+
+                          if candidate.startswith("#EXTINF:"):
+                              break
+
+                          j += 1
+
+                      if url and url not in seen_urls:
+                          seen_urls.add(url)
+
+                          if 'group-title="' in metadata:
+                              metadata = re.sub(
+                                  r'group-title="[^"]*"',
+                                  f'group-title="{group}"',
+                                  metadata
+                              )
+                          else:
+                              comma = metadata.find(",")
+
+                              if comma != -1:
+                                  metadata = (
+                                      metadata[:comma]
+                                      + f' group-title="{group}"'
+                                      + metadata[comma:]
+                                  )
+
+                          channel_name = metadata.split(",")[-1].strip()
+
+                          channels.append({
+                              "group": group,
+                              "name": channel_name,
+                              "metadata": metadata,
+                              "url": url
+                          })
+
+                      i = j + 1
+
+                  else:
+                      i += 1
+
+          group_order = {
+              "Deutsch": 0,
+              "Persisch": 1
+          }
+
+          channels.sort(
+              key=lambda x: (
+                  group_order[x["group"]],
+                  x["name"].casefold()
+              )
+          )
+
+          with open(output_file, "w", encoding="utf-8") as f:
+              f.write("#EXTM3U\n")
+
+              for channel in channels:
+                  f.write(channel["metadata"] + "\n")
+                  f.write(channel["url"] + "\n")
+
+          deutsch = sum(1 for x in channels if x["group"] == "Deutsch")
+          persisch = sum(1 for x in channels if x["group"] == "Persisch")
+
+          print("============================")
+          print("Playlist erstellt")
+          print("============================")
+          print(f"Deutsch:  {deutsch} Sender")
+          print(f"Persisch: {persisch} Sender")
+          print(f"Gesamt:   {len(channels)} Sender")
 
       - name: Remove temporary files
         run: |
-          rm -f de.m3u ir.m3u fas.m3u
+          rm -f deutsch.m3u iran.m3u persisch.m3u
 
       - name: Commit playlist
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add TV-Deutschland-Iran-Persisch.m3u
-          git diff --cached --quiet || git commit -m "Update IPTV Playlist"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "Keine Aenderungen"
+          else
+            git commit -m "Update Deutsch und Persisch IPTV Playlist"
+            git push
+          fi
