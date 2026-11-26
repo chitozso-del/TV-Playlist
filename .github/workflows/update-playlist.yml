@@ -13,252 +13,261 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      # ============================================================
-      # 1. Repository laden
-      # ============================================================
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
-      # ============================================================
-      # 2. Alle IPTV Quellen herunterladen
-      # ============================================================
-
-      - name: Download IPTV playlists
+      - name: Download playlists
         run: |
+          curl -fL "https://iptv-org.github.io/iptv/countries/de.m3u" -o deutsch.m3u
+          curl -fL "https://iptv-org.github.io/iptv/countries/ir.m3u" -o iran.m3u
+          curl -fL "https://iptv-org.github.io/iptv/languages/fas.m3u" -o persisch.m3u
+          curl -fL "https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/ir_telewebion.m3u" -o telewebion.m3u
+          curl -fL "https://raw.githubusercontent.com/shayanline/iptv-iran/main/playlists/categories/sat-movies.m3u" -o persian-movies.m3u
 
-          echo "Lade deutsche Sender..."
-          curl -fL \
-          "https://iptv-org.github.io/iptv/countries/de.m3u" \
-          -o deutsch.m3u
-
-          echo "Lade iranische Sender..."
-          curl -fL \
-          "https://iptv-org.github.io/iptv/countries/ir.m3u" \
-          -o iran.m3u
-
-          echo "Lade weltweit persischsprachige Sender..."
-          curl -fL \
-          "https://iptv-org.github.io/iptv/languages/fas.m3u" \
-          -o persisch.m3u
-
-          echo "Lade Telewebion Sender..."
-          curl -fL \
-          "https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/ir_telewebion.m3u" \
-          -o telewebion.m3u
-
-          echo "Lade persische Filme und Serien Sender..."
-          curl -fL \
-          "https://raw.githubusercontent.com/shayanline/iptv-iran/main/playlists/categories/sat-movies.m3u" \
-          -o persian-movies.m3u
-
-
-      # ============================================================
-      # 3. Playlists zusammenfuehren und kategorisieren
-      # ============================================================
-
-      - name: Create categorized IPTV playlist
+      - name: Build categorized playlist
         shell: python
         run: |
-
           import re
 
-
-          # --------------------------------------------------------
-          # QUELLEN
-          #
-          # WICHTIG:
-          # Die spezielle Movies-Liste steht vor Iran/Persisch.
-          # Dadurch werden doppelte Movie-Sender zuerst als
-          # "Persisch | Filme & Serien" erkannt.
-          # --------------------------------------------------------
-
           sources = [
-
               ("deutsch.m3u", "Deutsch"),
-
               ("persian-movies.m3u", "PersischMovies"),
-
               ("iran.m3u", "Persisch"),
-
               ("persisch.m3u", "Persisch"),
-
               ("telewebion.m3u", "Telewebion")
-
           ]
 
-
-          OUTPUT = "TV-Deutschland-Iran-Persisch.m3u"
-
+          output = "TV-Deutschland-Iran-Persisch.m3u"
           seen_urls = set()
-
           channels = []
 
-
-          # ========================================================
-          # Hilfsfunktion
-          # ========================================================
-
-          def contains(name, words):
-
-              return any(
-                  word in name
-                  for word in words
-              )
-
-
-          # ========================================================
-          # DEUTSCH + PERSISCH KATEGORISIERUNG
-          # ========================================================
+          def has(name, words):
+              return any(word in name for word in words)
 
           def normal_category(name, language):
-
               n = name.lower()
 
-
-              # ----------------------------------------------------
-              # NEWS
-              # ----------------------------------------------------
-
-              if contains(n, [
-
-                  "news",
-                  "nachrichten",
-                  "tagesschau",
-                  "welt",
-                  "ntv",
-                  "phoenix",
-
-                  "iran international",
-                  "iranintl",
-
-                  "bbc persian",
-
-                  "voa",
-
-                  "khabar",
-                  "خبر"
-
+              if has(n, [
+                  "news", "nachrichten", "tagesschau", "welt",
+                  "ntv", "phoenix", "iran international",
+                  "iranintl", "bbc persian", "voa", "khabar", "خبر"
               ]):
-
                   return f"{language} | News"
 
-
-              # ----------------------------------------------------
-              # MUSIK
-              # ----------------------------------------------------
-
-              if contains(n, [
-
-                  "music",
-                  "musik",
-                  "radio",
-                  "hits",
-                  "hit",
-
-                  "deluxe",
-
-                  "pmc",
-
-                  "radio javan",
-
-                  "ava music"
-
+              if has(n, [
+                  "music", "musik", "radio", "hits", "deluxe",
+                  "pmc", "radio javan", "ava music"
               ]):
-
                   return f"{language} | Musik"
 
-
-              # ----------------------------------------------------
-              # SPORT
-              # ----------------------------------------------------
-
-              if contains(n, [
-
-                  "sport",
-                  "sports",
-
-                  "football",
-
-                  "fussball",
-                  "fußball",
-
-                  "bundesliga",
-
-                  "varzesh",
-                  "ورزش"
-
+              if has(n, [
+                  "sport", "sports", "football", "fussball",
+                  "fußball", "bundesliga", "varzesh", "ورزش"
               ]):
-
                   return f"{language} | Sport"
 
-
-              # ----------------------------------------------------
-              # KINDER
-              # ----------------------------------------------------
-
-              if contains(n, [
-
-                  "kika",
-                  "kinder",
-                  "kids",
-
-                  "junior",
-
-                  "cartoon",
-
-                  "baby",
-
-                  "pooya",
-                  "pouya",
-
-                  "koodak",
-
-                  "پویا",
-                  "کودک"
-
+              if has(n, [
+                  "kika", "kinder", "kids", "junior", "cartoon",
+                  "baby", "pooya", "pouya", "koodak", "پویا", "کودک"
               ]):
-
                   return f"{language} | Kinder"
 
-
-              # ----------------------------------------------------
-              # FILME UND SERIEN
-              # ----------------------------------------------------
-
-              if contains(n, [
-
-                  "movie",
-                  "movies",
-
-                  "film",
-                  "filme",
-
-                  "cinema",
-                  "kino",
-
-                  "series",
-                  "serie",
-                  "serial",
-
-                  "ifilm",
-
-                  "namayesh",
-
-                  "tamasha",
-
-                  "نمایش",
-                  "تماشا"
-
+              if has(n, [
+                  "movie", "movies", "film", "filme", "cinema",
+                  "kino", "series", "serie", "serial",
+                  "ifilm", "namayesh", "tamasha", "نمایش", "تماشا"
               ]):
-
                   return f"{language} | Filme & Serien"
 
+              if language == "Deutsch":
+                  if has(n, [
+                      "doku", "documentary", "history",
+                      "science", "wissen", "natur"
+                  ]):
+                      return "Deutsch | Doku"
 
-              # ----------------------------------------------------
-              # SPEZIELL DEUTSCH
-              # ----------------------------------------------------
+                  if has(n, [
+                      "wdr", "ndr", "swr", "mdr", "rbb",
+                      "radio bremen", "br ", "hr ", "sr "
+                  ]):
+                      return "Deutsch | Regional"
 
-              if 
+              return f"{language} | Allgemein"
+
+          def telewebion_category(name):
+              n = name.lower()
+
+              if has(n, [
+                  "irinn", "news", "khabar", "خبر"
+              ]):
+                  return "Telewebion | News"
+
+              if has(n, [
+                  "varzesh", "sport", "sports", "ورزش"
+              ]):
+                  return "Telewebion | Sport"
+
+              if has(n, [
+                  "ifilm", "namayesh", "movie", "movies",
+                  "film", "cinema", "tamasha", "نمایش", "تماشا"
+              ]):
+                  return "Telewebion | Filme & Serien"
+
+              if has(n, [
+                  "pooya", "pouya", "koodak", "kids",
+                  "child", "children", "پویا", "کودک"
+              ]):
+                  return "Telewebion | Kinder"
+
+              if has(n, [
+                  "abadan", "aflak", "aftab", "alborz", "atrak",
+                  "azerbaijan", "baran", "boushehr", "bushehr",
+                  "dena", "eshragh", "fars", "hamedan", "hamoon",
+                  "ilam", "isfahan", "jahanbin", "kerman",
+                  "khalij", "khorasan", "khuzestan", "kordestan",
+                  "kurdistan", "lorestan", "mahabad", "qazvin",
+                  "semnan", "sahand", "sabalan", "tabarestan",
+                  "yazd", "zagros", "kish", "golestan"
+              ]):
+                  return "Telewebion | Regional"
+
+              return "Telewebion | Allgemein"
+
+          for filename, source_type in sources:
+              with open(filename, "r", encoding="utf-8-sig", errors="ignore") as f:
+                  lines = f.readlines()
+
+              i = 0
+
+              while i < len(lines):
+                  metadata = lines[i].strip()
+
+                  if not metadata.startswith("#EXTINF:"):
+                      i += 1
+                      continue
+
+                  name = (
+                      metadata.split(",", 1)[1].strip()
+                      if "," in metadata else "Unbekannt"
+                  )
+
+                  url = ""
+                  j = i + 1
+
+                  while j < len(lines):
+                      candidate = lines[j].strip()
+
+                      if candidate and not candidate.startswith("#"):
+                          url = candidate
+                          break
+
+                      if candidate.startswith("#EXTINF:"):
+                          break
+
+                      j += 1
+
+                  if url and url not in seen_urls:
+                      seen_urls.add(url)
+
+                      if source_type == "Telewebion":
+                          group = telewebion_category(name)
+                      elif source_type == "PersischMovies":
+                          group = "Persisch | Filme & Serien"
+                      else:
+                          group = normal_category(name, source_type)
+
+                      if 'group-title="' in metadata:
+                          metadata = re.sub(
+                              r'group-title="[^"]*"',
+                              f'group-title="{group}"',
+                              metadata
+                          )
+                      else:
+                          comma = metadata.find(",")
+                          if comma != -1:
+                              metadata = (
+                                  metadata[:comma]
+                                  + f' group-title="{group}"'
+                                  + metadata[comma:]
+                              )
+
+                      channels.append({
+                          "group": group,
+                          "name": name,
+                          "metadata": metadata,
+                          "url": url
+                      })
+
+                  i = j + 1
+
+          order = {
+              "Deutsch | News": 10,
+              "Deutsch | Filme & Serien": 11,
+              "Deutsch | Musik": 12,
+              "Deutsch | Sport": 13,
+              "Deutsch | Kinder": 14,
+              "Deutsch | Doku": 15,
+              "Deutsch | Regional": 16,
+              "Deutsch | Allgemein": 17,
+
+              "Persisch | News": 20,
+              "Persisch | Filme & Serien": 21,
+              "Persisch | Musik": 22,
+              "Persisch | Sport": 23,
+              "Persisch | Kinder": 24,
+              "Persisch | Allgemein": 25,
+
+              "Telewebion | News": 30,
+              "Telewebion | Sport": 31,
+              "Telewebion | Filme & Serien": 32,
+              "Telewebion | Kinder": 33,
+              "Telewebion | Regional": 34,
+              "Telewebion | Allgemein": 35
+          }
+
+          channels.sort(
+              key=lambda x: (
+                  order.get(x["group"], 99),
+                  x["name"].casefold()
+              )
+          )
+
+          with open(output, "w", encoding="utf-8") as f:
+              f.write("#EXTM3U\n")
+
+              for channel in channels:
+                  f.write(channel["metadata"] + "\n")
+                  f.write(channel["url"] + "\n")
+
+          print("====================================")
+          print("IPTV PLAYLIST STATISTIK")
+          print("====================================")
+
+          for group in order:
+              count = sum(
+                  1 for channel in channels
+                  if channel["group"] == group
+              )
+              print(f"{group}: {count}")
+
+          print("------------------------------------")
+          print(f"GESAMT: {len(channels)} Sender")
+
+      - name: Remove temporary files
+        run: |
+          rm -f deutsch.m3u iran.m3u persisch.m3u
+          rm -f telewebion.m3u persian-movies.m3u
+
+      - name: Commit playlist
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add TV-Deutschland-Iran-Persisch.m3u
+
+          if git diff --cached --quiet; then
+            echo "Keine Aenderungen an der Playlist."
+          else
+            git commit -m "Update categorized IPTV playlist"
+            git push
+          fi
