@@ -16,55 +16,53 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # =========================================================
+      # HAUPTQUELLEN
+      # =========================================================
       - name: Download required playlists
         shell: bash
         run: |
           set -euo pipefail
 
-          curl \
-            --retry 3 \
-            --retry-delay 2 \
-            --connect-timeout 20 \
-            --max-time 120 \
-            --fail \
-            --location \
-            --show-error \
+          download_required() {
+            local url="$1"
+            local file="$2"
+
+            echo "Lade: $url"
+
+            curl \
+              --retry 3 \
+              --retry-delay 2 \
+              --connect-timeout 20 \
+              --max-time 120 \
+              --fail \
+              --location \
+              --show-error \
+              "$url" \
+              --output "$file"
+
+            echo "Erfolgreich geladen: $file"
+          }
+
+          download_required \
             "https://iptv-org.github.io/iptv/countries/de.m3u" \
-            --output deutsch.m3u
+            "deutsch.m3u"
 
-          curl \
-            --retry 3 \
-            --retry-delay 2 \
-            --connect-timeout 20 \
-            --max-time 120 \
-            --fail \
-            --location \
-            --show-error \
+          download_required \
             "https://iptv-org.github.io/iptv/countries/ir.m3u" \
-            --output iran.m3u
+            "iran.m3u"
 
-          curl \
-            --retry 3 \
-            --retry-delay 2 \
-            --connect-timeout 20 \
-            --max-time 120 \
-            --fail \
-            --location \
-            --show-error \
+          download_required \
             "https://iptv-org.github.io/iptv/languages/fas.m3u" \
-            --output persisch.m3u
+            "persisch.m3u"
 
-          curl \
-            --retry 3 \
-            --retry-delay 2 \
-            --connect-timeout 20 \
-            --max-time 120 \
-            --fail \
-            --location \
-            --show-error \
+          download_required \
             "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ir_telewebion.m3u" \
-            --output telewebion.m3u
+            "telewebion.m3u"
 
+      # =========================================================
+      # ZUSÄTZLICHE PERSISCHE QUELLEN
+      # =========================================================
       - name: Download additional Persian playlists
         shell: bash
         run: |
@@ -89,7 +87,6 @@ jobs:
             else
               printf '#EXTM3U\n' > "$file"
               echo "Quelle nicht erreichbar: $file"
-              echo "Leere Ersatzdatei wurde erstellt."
             fi
           }
 
@@ -105,7 +102,10 @@ jobs:
             "https://raw.githubusercontent.com/shayanline/iptv-iran/main/playlists/categories/sat-movies.m3u" \
             "persian-movies.m3u"
 
-      - name: Download optional German FAST playlists
+      # =========================================================
+      # DEUTSCHE FAST-QUELLEN
+      # =========================================================
+      - name: Download German FAST playlists
         shell: bash
         run: |
           set -u
@@ -129,7 +129,6 @@ jobs:
             else
               printf '#EXTM3U\n' > "$file"
               echo "Quelle nicht erreichbar: $file"
-              echo "Leere Ersatzdatei wurde erstellt."
             fi
           }
 
@@ -145,92 +144,129 @@ jobs:
             "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/de_samsung.m3u" \
             "de-samsung.m3u"
 
-      - name: Check and add DELUXE audio streams
+      # =========================================================
+      # NEU: FREE-TV/IPTV DEUTSCHLAND + IRAN
+      # =========================================================
+      - name: Download Free-TV Germany and Iran
+        shell: bash
+        run: |
+          set -u
+
+          download_optional() {
+            local url="$1"
+            local file="$2"
+
+            echo "Prüfe zusätzliche Quelle:"
+            echo "$url"
+
+            if curl \
+              --retry 3 \
+              --retry-delay 2 \
+              --connect-timeout 20 \
+              --max-time 120 \
+              --fail \
+              --location \
+              --show-error \
+              "$url" \
+              --output "$file"
+            then
+              echo "Erfolgreich geladen: $file"
+
+              COUNT=$(grep -c '^#EXTINF:' "$file" || true)
+
+              echo "Gefundene Sender: $COUNT"
+            else
+              printf '#EXTM3U\n' > "$file"
+
+              echo "Quelle nicht erreichbar:"
+              echo "$url"
+            fi
+          }
+
+          download_optional \
+            "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_germany.m3u8" \
+            "free-tv-germany.m3u"
+
+          download_optional \
+            "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_iran.m3u8" \
+            "free-tv-iran.m3u"
+
+      # =========================================================
+      # DELUXE AUDIOSTREAMS TESTEN
+      # =========================================================
+      - name: Check DELUXE audio streams
         shell: bash
         run: |
           set -u
 
           OUTPUT="deluxe-audio.m3u"
-          TEST_DIRECTORY="deluxe-stream-tests"
+          TESTDIR="deluxe-stream-tests"
 
-          mkdir -p "$TEST_DIRECTORY"
+          mkdir -p "$TESTDIR"
+
           printf '#EXTM3U\n' > "$OUTPUT"
 
-          add_stream_if_reachable() {
+          add_if_reachable() {
             local name="$1"
             local url="$2"
-            local safe_name
-            local test_file
-            local curl_status=0
-            local received_bytes=0
+            local file
+            local bytes=0
 
-            safe_name=$(printf '%s' "$name" | tr -cs 'A-Za-z0-9' '_')
-            test_file="$TEST_DIRECTORY/${safe_name}.test"
+            file="$TESTDIR/test.bin"
 
-            rm -f "$test_file"
+            rm -f "$file"
 
-            echo "----------------------------------------"
-            echo "Prüfe DELUXE-Stream: $name"
-            echo "URL: $url"
+            echo "Prüfe: $name"
 
             curl \
               --location \
               --fail \
               --silent \
               --show-error \
-              --retry 2 \
-              --retry-delay 2 \
               --connect-timeout 15 \
               --max-time 20 \
               --range 0-65535 \
               --user-agent "Mozilla/5.0 IPTV-Playlist-Check/1.0" \
-              --output "$test_file" \
-              "$url" || curl_status=$?
+              --output "$file" \
+              "$url" || true
 
-            if [ -f "$test_file" ]; then
-              received_bytes=$(wc -c < "$test_file")
+            if [ -f "$file" ]; then
+              bytes=$(wc -c < "$file")
             fi
 
-            echo "Curl-Rückgabewert: $curl_status"
-            echo "Empfangene Bytes: $received_bytes"
+            echo "Empfangene Bytes: $bytes"
 
-            # Ein Livestream kann nach Erreichen des Zeitlimits von curl
-            # mit Status 28 beendet werden, obwohl bereits gültige Daten
-            # empfangen wurden. Deshalb werden sowohl der HTTP-Abruf als
-            # auch die tatsächlich empfangene Datenmenge berücksichtigt.
-            if [ "$received_bytes" -ge 1024 ]; then
-              echo "Stream erreichbar: $name"
+            if [ "$bytes" -ge 1024 ]; then
 
               printf '%s\n' \
                 "#EXTINF:-1 group-title=\"Deutsch | Musik\",$name" \
                 "$url" \
                 >> "$OUTPUT"
+
+              echo "Übernommen: $name"
+
             else
-              echo "Stream nicht ausreichend erreichbar: $name"
-              echo "Der Stream wird nicht in die Playlist übernommen."
+
+              echo "Nicht erreichbar: $name"
+
             fi
           }
 
-          add_stream_if_reachable \
+          add_if_reachable \
             "DELUXE MUSIC Radio" \
             "https://audiostreams.deluxemusic.tv/music/mp3-192/audiostreams.deluxemusic.tv/"
 
-          add_stream_if_reachable \
+          add_if_reachable \
             "DELUXE MUSIC EASY" \
             "https://audiostreams.deluxemusic.tv/easy/mp3-192/audiostreams.deluxemusic.tv/"
 
-          add_stream_if_reachable \
+          add_if_reachable \
             "DELUXE MUSIC LOUNGE" \
             "https://audiostreams.deluxemusic.tv/lounge/mp3-192/audiostreams.deluxemusic.tv/"
 
-          DELUXE_COUNT=$(grep -c '^#EXTINF:' "$OUTPUT" || true)
-
-          echo "========================================"
-          echo "Erreichbare DELUXE-Streams: $DELUXE_COUNT"
-          echo "========================================"
-
-          cat "$OUTPUT"
-
+      # =========================================================
+      # PLAYLIST ERSTELLEN
+      # =========================================================
       - name: Build categorized playlist
         shell: python
         run: |
@@ -239,697 +275,72 @@ jobs:
 
           OUTPUT = "TV-Deutschland-Iran-Persisch.m3u"
 
-          # Spezifische Quellen stehen vor allgemeineren Quellen.
-          # So werden Musik- und Movie-Kanäle bevorzugt richtig gruppiert.
           sources = [
+
+              # Deutschland
               ("deutsch.m3u", "Deutsch"),
 
-              # DELUXE-Audiostreams wurden im vorherigen Schritt geprüft.
+              # NEU: Free-TV Deutschland
+              ("free-tv-germany.m3u", "Deutsch"),
+
+              # geprüfte DELUXE Audio-Streams
               ("deluxe-audio.m3u", "DeutschMusic"),
 
+              # Deutsche FAST-Dienste
               ("de-pluto.m3u", "DeutschFAST"),
               ("de-rakuten.m3u", "DeutschFAST"),
               ("de-samsung.m3u", "DeutschFAST"),
 
+              # Persisch Musik / Filme
               ("persian-music.m3u", "PersischMusic"),
               ("persian-movies.m3u", "PersischMovies"),
 
+              # weitere persische Quellen
               ("iran-global.m3u", "Persisch"),
               ("iran.m3u", "Persisch"),
               ("persisch.m3u", "Persisch"),
 
+              # NEU: Free-TV Iran
+              ("free-tv-iran.m3u", "Persisch"),
+
+              # Telewebion
               ("telewebion.m3u", "Telewebion"),
+
           ]
 
-          # Entfernt nur wirklich identische Einträge:
-          # gleicher Sendername und gleiche Stream-URL.
-          # Alternative Streams desselben Senders bleiben erhalten.
           seen_entries = set()
           channels = []
 
           def contains(text, words):
-              return any(word in text for word in words)
-
-          def get_attribute(metadata, attribute):
-              match = re.search(
-                  rf'{re.escape(attribute)}="([^"]*)"',
-                  metadata,
-                  flags=re.IGNORECASE,
-              )
-
-              return match.group(1).strip() if match else ""
-
-          def set_group(metadata, group):
-              if re.search(
-                  r'group-title="[^"]*"',
-                  metadata,
-                  flags=re.IGNORECASE,
-              ):
-                  return re.sub(
-                      r'group-title="[^"]*"',
-                      f'group-title="{group}"',
-                      metadata,
-                      flags=re.IGNORECASE,
-                  )
-
-              comma = metadata.find(",")
-
-              if comma == -1:
-                  return metadata
-
-              return (
-                  metadata[:comma]
-                  + f' group-title="{group}"'
-                  + metadata[comma:]
+              return any(
+                  word in text
+                  for word in words
               )
 
           def normalize_name(name):
               name = name.casefold().strip()
-              name = re.sub(r"\s+", " ", name)
+              name = re.sub(
+                  r"\s+",
+                  " ",
+                  name
+              )
               return name
 
-          def normal_category(name, language):
-              n = name.casefold()
-
-              if contains(n, [
-                  "news",
-                  "nachrichten",
-                  "tagesschau",
-                  "welt",
-                  "ntv",
-                  "phoenix",
-                  "iran international",
-                  "iranintl",
-                  "bbc persian",
-                  "voa",
-                  "khabar",
-                  "خبر",
-              ]):
-                  return f"{language} | News"
-
-              if contains(n, [
-                  "rjtv",
-                  "rj tv",
-                  "radio javan",
-                  "radiojavan",
-                  "music",
-                  "musik",
-                  "radio",
-                  "hits",
-                  "hit",
-                  "deluxe",
-                  "pmc",
-                  "ava music",
-                  "persian music",
-                  "tapesh",
-                  "melody",
-                  "musictop",
-                  "music top",
-              ]):
-                  return f"{language} | Musik"
-
-              if contains(n, [
-                  "sport",
-                  "sports",
-                  "football",
-                  "fussball",
-                  "fußball",
-                  "bundesliga",
-                  "varzesh",
-                  "ورزش",
-              ]):
-                  return f"{language} | Sport"
-
-              if contains(n, [
-                  "kika",
-                  "kinder",
-                  "kids",
-                  "junior",
-                  "cartoon",
-                  "baby",
-                  "pooya",
-                  "pouya",
-                  "koodak",
-                  "پویا",
-                  "کودک",
-              ]):
-                  return f"{language} | Kinder"
-
-              if contains(n, [
-                  "movie",
-                  "movies",
-                  "film",
-                  "filme",
-                  "cinema",
-                  "kino",
-                  "series",
-                  "serie",
-                  "serial",
-                  "ifilm",
-                  "namayesh",
-                  "tamasha",
-                  "نمایش",
-                  "تماشا",
-              ]):
-                  return f"{language} | Filme & Serien"
-
-              if language == "Deutsch":
-                  if contains(n, [
-                      "doku",
-                      "documentary",
-                      "history",
-                      "science",
-                      "wissen",
-                      "natur",
-                  ]):
-                      return "Deutsch | Doku"
-
-                  if contains(n, [
-                      "wdr",
-                      "ndr",
-                      "swr",
-                      "mdr",
-                      "rbb",
-                      "radio bremen",
-                      "br ",
-                      "hr ",
-                      "sr ",
-                  ]):
-                      return "Deutsch | Regional"
-
-              return f"{language} | Allgemein"
-
-          def fast_category(name, original_group):
-              text = f"{name} {original_group}".casefold()
-
-              if contains(text, [
-                  "kinder",
-                  "kids",
-                  "junior",
-                  "nick",
-                  "nickelodeon",
-                  "cartoon",
-                  "animation",
-                  "anime",
-                  "family",
-                  "familie",
-                  "sponge",
-                  "baby",
-                  "toggo",
-              ]):
-                  return "Deutsch FAST | Kinder"
-
-              if contains(text, [
-                  "krimi",
-                  "crime",
-                  "true crime",
-                  "thriller",
-                  "mystery",
-                  "polizei",
-                  "kommissar",
-                  "detective",
-                  "detektiv",
-                  "horror",
-                  "paranormal",
-              ]):
-                  return "Deutsch FAST | Krimi & Thriller"
-
-              if contains(text, [
-                  "comedy",
-                  "komödie",
-                  "komoedie",
-                  "humor",
-                  "fun",
-                  "lachen",
-                  "sitcom",
-                  "comedian",
-              ]):
-                  return "Deutsch FAST | Comedy"
-
-              if contains(text, [
-                  "action",
-                  "western",
-                  "adventure",
-                  "abenteuer",
-                  "martial arts",
-                  "heroes",
-                  "hero",
-              ]):
-                  return "Deutsch FAST | Action"
-
-              if contains(text, [
-                  "serie",
-                  "series",
-                  "serien",
-                  "telenovela",
-                  "soap",
-                  "drama",
-                  "sitcom",
-                  "episoden",
-                  "tv shows",
-              ]):
-                  return "Deutsch FAST | Serien"
-
-              if contains(text, [
-                  "movie",
-                  "movies",
-                  "film",
-                  "filme",
-                  "cinema",
-                  "kino",
-                  "kultfilm",
-                  "filmgold",
-                  "netzkino",
-                  "wedotv movies",
-                  "moviedome",
-                  "rakuten tv",
-              ]):
-                  return "Deutsch FAST | Filme"
-
-              if contains(text, [
-                  "doku",
-                  "documentary",
-                  "documentaries",
-                  "history",
-                  "science",
-                  "wissen",
-                  "natur",
-                  "animals",
-                  "wildlife",
-                  "travel",
-                  "reise",
-                  "biografie",
-                  "biography",
-              ]):
-                  return "Deutsch FAST | Doku"
-
-              return "Deutsch FAST | Allgemein"
-
-          def telewebion_category(name):
-              n = name.casefold()
-
-              if contains(n, [
-                  "irinn",
-                  "news",
-                  "khabar",
-                  "خبر",
-              ]):
-                  return "Telewebion | News"
-
-              if contains(n, [
-                  "varzesh",
-                  "sport",
-                  "sports",
-                  "ورزش",
-              ]):
-                  return "Telewebion | Sport"
-
-              if contains(n, [
-                  "ifilm",
-                  "namayesh",
-                  "movie",
-                  "movies",
-                  "film",
-                  "cinema",
-                  "tamasha",
-                  "نمایش",
-                  "تماشا",
-              ]):
-                  return "Telewebion | Filme & Serien"
-
-              if contains(n, [
-                  "pooya",
-                  "pouya",
-                  "koodak",
-                  "kids",
-                  "child",
-                  "children",
-                  "پویا",
-                  "کودک",
-              ]):
-                  return "Telewebion | Kinder"
-
-              if contains(n, [
-                  "abadan",
-                  "aflak",
-                  "aftab",
-                  "alborz",
-                  "atrak",
-                  "azerbaijan",
-                  "baran",
-                  "boushehr",
-                  "bushehr",
-                  "dena",
-                  "eshragh",
-                  "fars",
-                  "hamedan",
-                  "hamoon",
-                  "ilam",
-                  "isfahan",
-                  "jahanbin",
-                  "kerman",
-                  "khalij",
-                  "khorasan",
-                  "khuzestan",
-                  "kordestan",
-                  "kurdistan",
-                  "lorestan",
-                  "mahabad",
-                  "qazvin",
-                  "semnan",
-                  "sahand",
-                  "sabalan",
-                  "tabarestan",
-                  "yazd",
-                  "zagros",
-                  "kish",
-                  "golestan",
-                  "makran",
-                  "khavaran",
-                  "noor",
-                  "sabz",
-              ]):
-                  return "Telewebion | Regional"
-
-              return "Telewebion | Allgemein"
-
-          for filename, source_type in sources:
-              path = Path(filename)
-
-              if not path.exists():
-                  print(
-                      f"Datei fehlt und wird übersprungen: {filename}"
-                  )
-                  continue
-
-              print(f"Verarbeite: {filename}")
-
-              lines = path.read_text(
-                  encoding="utf-8-sig",
-                  errors="ignore",
-              ).splitlines()
-
-              i = 0
-
-              while i < len(lines):
-                  metadata = lines[i].strip()
-
-                  if not metadata.startswith("#EXTINF:"):
-                      i += 1
-                      continue
-
-                  name = (
-                      metadata.split(",", 1)[1].strip()
-                      if "," in metadata
-                      else "Unbekannt"
-                  )
-
-                  original_group = get_attribute(
-                      metadata,
-                      "group-title",
-                  )
-
-                  url = ""
-                  j = i + 1
-
-                  while j < len(lines):
-                      candidate = lines[j].strip()
-
-                      if candidate.startswith("#EXTINF:"):
-                          break
-
-                      if candidate and not candidate.startswith("#"):
-                          url = candidate
-                          break
-
-                      j += 1
-
-                  if not url:
-                      i = max(j, i + 1)
-                      continue
-
-                  normalized_url = url.strip()
-                  normalized_name = normalize_name(name)
-
-                  entry_key = (
-                      normalized_name,
-                      normalized_url,
-                  )
-
-                  if entry_key in seen_entries:
-                      i = j + 1
-                      continue
-
-                  if source_type == "Deutsch":
-                      group = normal_category(
-                          name,
-                          "Deutsch",
-                      )
-
-                  elif source_type == "DeutschMusic":
-                      group = "Deutsch | Musik"
-
-                  elif source_type == "DeutschFAST":
-                      group = fast_category(
-                          name,
-                          original_group,
-                      )
-
-                  elif source_type == "PersischMusic":
-                      group = "Persisch | Musik"
-
-                  elif source_type == "PersischMovies":
-                      group = "Persisch | Filme & Serien"
-
-                  elif source_type == "Persisch":
-                      group = normal_category(
-                          name,
-                          "Persisch",
-                      )
-
-                  elif source_type == "Telewebion":
-                      group = telewebion_category(name)
-
-                  else:
-                      group = "Sonstige"
-
-                  # RJTV wird unabhängig von der Quelle immer
-                  # unter Persisch | Musik einsortiert.
-                  if contains(normalized_name, [
-                      "rjtv",
-                      "rj tv",
-                      "radio javan",
-                      "radiojavan",
-                  ]):
-                      group = "Persisch | Musik"
-
-                  metadata = set_group(
-                      metadata,
-                      group,
-                  )
-
-                  seen_entries.add(entry_key)
-
-                  channels.append({
-                      "group": group,
-                      "name": name,
-                      "metadata": metadata,
-                      "url": normalized_url,
-                  })
-
-                  i = j + 1
-
-          order = {
-              "Deutsch | News": 10,
-              "Deutsch | Filme & Serien": 11,
-              "Deutsch | Musik": 12,
-              "Deutsch | Sport": 13,
-              "Deutsch | Kinder": 14,
-              "Deutsch | Doku": 15,
-              "Deutsch | Regional": 16,
-              "Deutsch | Allgemein": 17,
-
-              "Deutsch FAST | Filme": 20,
-              "Deutsch FAST | Serien": 21,
-              "Deutsch FAST | Action": 22,
-              "Deutsch FAST | Krimi & Thriller": 23,
-              "Deutsch FAST | Comedy": 24,
-              "Deutsch FAST | Kinder": 25,
-              "Deutsch FAST | Doku": 26,
-              "Deutsch FAST | Allgemein": 27,
-
-              "Persisch | News": 30,
-              "Persisch | Filme & Serien": 31,
-              "Persisch | Musik": 32,
-              "Persisch | Sport": 33,
-              "Persisch | Kinder": 34,
-              "Persisch | Allgemein": 35,
-
-              "Telewebion | News": 40,
-              "Telewebion | Sport": 41,
-              "Telewebion | Filme & Serien": 42,
-              "Telewebion | Kinder": 43,
-              "Telewebion | Regional": 44,
-              "Telewebion | Allgemein": 45,
-
-              "Sonstige": 99,
-          }
-
-          channels.sort(
-              key=lambda channel: (
-                  order.get(channel["group"], 99),
-                  channel["name"].casefold(),
-                  channel["url"],
-              )
-          )
-
-          with open(
-              OUTPUT,
-              "w",
-              encoding="utf-8",
-              newline="\n",
-          ) as file:
-              file.write("#EXTM3U\n")
-
-              for channel in channels:
-                  file.write(channel["metadata"] + "\n")
-                  file.write(channel["url"] + "\n")
-
-          print("========================================")
-          print("IPTV-PLAYLIST ERSTELLT")
-          print("========================================")
-
-          for group in order:
-              count = sum(
-                  channel["group"] == group
-                  for channel in channels
+          def get_attribute(metadata, attribute):
+
+              match = re.search(
+                  rf'{re.escape(attribute)}="([^"]*)"',
+                  metadata,
+                  flags=re.IGNORECASE
               )
 
-              if count:
-                  print(f"{group}: {count}")
+              if match:
+                  return match.group(1).strip()
 
-          print("----------------------------------------")
-          print(f"Gesamt: {len(channels)} Einträge")
+              return ""
 
-          rjtv_count = sum(
-              "rjtv" in normalize_name(channel["name"])
-              or "rj tv" in normalize_name(channel["name"])
-              or "radio javan" in normalize_name(
-                  channel["name"]
-              )
-              for channel in channels
-          )
+          def set_group(metadata, group):
 
-          deluxe_count = sum(
-              "deluxe music" in normalize_name(
-                  channel["name"]
-              )
-              for channel in channels
-          )
-
-          print(f"RJTV/Radio-Javan-Einträge: {rjtv_count}")
-          print(f"DELUXE-Einträge: {deluxe_count}")
-
-          if not channels:
-              raise RuntimeError(
-                  "Die fertige Playlist enthält keine Sender."
-              )
-
-      - name: Validate generated playlist
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          PLAYLIST="TV-Deutschland-Iran-Persisch.m3u"
-
-          test -s "$PLAYLIST"
-
-          head -n 1 "$PLAYLIST" \
-            | grep -q '^#EXTM3U'
-
-          CHANNELS=$(grep -c '^#EXTINF:' "$PLAYLIST" || true)
-
-          if [ "$CHANNELS" -le 0 ]; then
-            echo "Fehler: Die Playlist enthält keine Sender."
-            exit 1
-          fi
-
-          echo "========================================"
-          echo "PLAYLIST-VALIDIERUNG"
-          echo "========================================"
-          echo "Playlist ist grundsätzlich gültig."
-          echo "Anzahl Einträge: $CHANNELS"
-
-          echo "----------------------------------------"
-          echo "Persische Musikeinträge:"
-
-          grep -c \
-            'group-title="Persisch | Musik"' \
-            "$PLAYLIST" || true
-
-          echo "----------------------------------------"
-          echo "RJTV-/Radio-Javan-Einträge:"
-
-          grep -i -c \
-            'RJTV\|RJ TV\|Radio Javan' \
-            "$PLAYLIST" || true
-
-          echo "----------------------------------------"
-          echo "DELUXE-Einträge:"
-
-          DELUXE_COUNT=$(grep -i -c \
-            'DELUXE MUSIC' \
-            "$PLAYLIST" || true)
-
-          echo "$DELUXE_COUNT"
-
-          if [ "$DELUXE_COUNT" -gt 0 ]; then
-            echo "Erreichbare DELUXE-Streams wurden integriert:"
-            grep -i -A1 \
-              'DELUXE MUSIC' \
-              "$PLAYLIST" || true
-          else
-            echo "Kein DELUXE-Stream war beim Workflow-Lauf erreichbar."
-            echo "Es wurde kein defekter DELUXE-Eintrag übernommen."
-          fi
-
-      - name: Remove temporary files
-        if: always()
-        shell: bash
-        run: |
-          rm -f deutsch.m3u
-          rm -f iran.m3u
-          rm -f persisch.m3u
-          rm -f iran-global.m3u
-          rm -f persian-music.m3u
-          rm -f persian-movies.m3u
-          rm -f telewebion.m3u
-          rm -f de-pluto.m3u
-          rm -f de-rakuten.m3u
-          rm -f de-samsung.m3u
-          rm -f deluxe-audio.m3u
-          rm -rf deluxe-stream-tests
-
-      - name: Commit playlist
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          git config \
-            user.name \
-            "github-actions[bot]"
-
-          git config \
-            user.email \
-            "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add TV-Deutschland-Iran-Persisch.m3u
-
-          if git diff --cached --quiet; then
-            echo "Keine Änderungen an der Playlist."
-          else
-            git commit -m \
-              "Update German, Persian, FAST and DELUXE streams"
-
-            git push
-          fi
+              if re.search(
+                  r'group-title="[^"]*"',
+                  metadata
