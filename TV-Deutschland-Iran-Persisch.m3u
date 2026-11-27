@@ -136,17 +136,29 @@ jobs:
               return match.group(1).strip() if match else ""
 
           def set_group(metadata, group):
-              if re.search(r'group-title="[^"]*"', metadata, flags=re.IGNORECASE):
+              pattern = r'group-title="[^"]*"'
+
+              if re.search(
+                  pattern,
+                  metadata,
+                  flags=re.IGNORECASE,
+              ):
                   return re.sub(
-                      r'group-title="[^"]*"',
+                      pattern,
                       f'group-title="{group}"',
                       metadata,
                       flags=re.IGNORECASE,
                   )
+
               comma = metadata.find(",")
               if comma == -1:
                   return metadata
-              return metadata[:comma] + f' group-title="{group}"' + metadata[comma:]
+
+              return (
+                  metadata[:comma]
+                  + f' group-title="{group}"'
+                  + metadata[comma:]
+              )
 
           def normal_category(name, language):
               n = name.casefold()
