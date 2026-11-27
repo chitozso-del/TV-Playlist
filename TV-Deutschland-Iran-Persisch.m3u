@@ -59,6 +59,12 @@ https://sdn-global-live-streaming-packager-cache.3qsdn.com/64733/64733_264_live.
 https://jmp2.uk/stvp-CHAJ0500413A
 #EXTINF:-1 tvg-id="DeluxeMusic.de@SD" tvg-logo="https://i.imgur.com/HimuPPb.png" group-title="Deutsch | Musik",Deluxe Music (720p)
 https://sdn-global-live-streaming-packager-cache.3qsdn.com/13456/13456_264_live.m3u8
+#EXTINF:-1 group-title="Deutsch | Musik",DELUXE MUSIC EASY
+https://audiostreams.deluxemusic.tv/easy/mp3-192/audiostreams.deluxemusic.tv/
+#EXTINF:-1 group-title="Deutsch | Musik",DELUXE MUSIC LOUNGE
+https://audiostreams.deluxemusic.tv/lounge/mp3-192/audiostreams.deluxemusic.tv/
+#EXTINF:-1 group-title="Deutsch | Musik",DELUXE MUSIC Radio
+https://audiostreams.deluxemusic.tv/music/mp3-192/audiostreams.deluxemusic.tv/
 #EXTINF:-1 tvg-id="DeluxeRap.de@SD" tvg-logo="https://i.imgur.com/s3h67hx.png" group-title="Deutsch | Musik",Deluxe Rap (1080p)
 https://sdn-global-live-streaming-packager-cache.3qsdn.com/65183/65183_264_live.m3u8
 #EXTINF:-1 tvg-id="FolxMusicTelevision.de@SD" tvg-logo="https://i.imgur.com/ze04puX.png" group-title="Deutsch | Musik",Folx Music Television
